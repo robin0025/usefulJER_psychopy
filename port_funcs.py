@@ -80,11 +80,11 @@ def portreset(mode=0, port = []):
         print('Sending zero trigger value')
         port.write(base)
     elif mode == 3 and port:
-        port.write(char(int(max)))
+        port.write(chr(int(max)))
         print('Sending max trigger value')
         core.wait(1.0)
         print('Sending zero trigger value')
-        port.write(char(int(base)))
+        port.write(chr(int(base)))
     else:
         print('No port was reset')
 
@@ -167,9 +167,9 @@ def trigselect(code,send,mode=0,port=[],clock=None):
                 print('code %s sent at time= %s'%(code,clock.getTime()))
                 
     elif mode == 3 and port:
-        port.write(char(int(0)))
+        port.write(chr(int(0)))
         if send == 1:
-            port.write(char(int(code)))
+            port.write(chr(int(code)))
             send = 0
             if clock != None:
                 print('code %s sent at time= %s'%(code,clock.getTime()))
