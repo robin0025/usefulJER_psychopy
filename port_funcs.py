@@ -4,7 +4,12 @@
 ###########################################################################
 #
 # Simple set of functions for different EEG trigger communication systems.
-#
+# containing:
+# 1 - nidaq_init() = Initates national instrument port with key parameters.
+# 2 - serial_init() = Initates national instrument port with key parameters.
+# 3 - portreset() = Resets port by sending high/low for 3 common trigger types.
+# 4 - initTrig() = Handles initiation of 3 common trigger types and resets ports
+# 5 - send = trigselect() = placed under win.flip() to send trigger and reset send variable 		immediately after screen is flipped.
 ###########################################################################
 
 
@@ -131,7 +136,7 @@ def initTrig(mode=0,add=0,path=''):
 #######################################################
 # Send trigger function.
 #
-# Function usually placed with win.flip(), so that triggers are sent immediately when stim is flipped to screen. 
+# Function usually ptrigselect(code,send,mode=0,port=[],clock=None)laced with win.flip(), so that triggers are sent immediately when stim is flipped to screen. 
 # Useage if sendTrigger is set to zero before exp and set to one on event onset:
 # - sendTrigger = trigselect(<someCode>, sendTrigger, <someMode>, <somePortObject>)
 #
