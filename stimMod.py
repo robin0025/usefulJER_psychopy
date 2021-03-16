@@ -3,7 +3,7 @@
 """
 Created on Mon Mar 15 15:52:10 2021
 
-@author: jrobinson
+@author: Jonathan Robinson [@robin0025]
 """
 
 import numpy as np
@@ -51,12 +51,3 @@ def selectgradient(t,s_array,totTime=1.0,types=0, imObj=None):
     else:
         return(sample)
 
-#sinu = sinOp()
-#selectgradient(1.4,sinu)
-#x= list(range(0,40))
-#y = 0.65
-#sample = selectgradient(y,x,40/60)
-
-#x = sinOp(13)
-#t =0.9
-#samp = selectgradient(t,x)
