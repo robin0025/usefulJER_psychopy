@@ -49,5 +49,5 @@ def selectgradient(t,s_array,totTime=1.0,types=0, imObj=None):
     elif types == 2 and imObj != None:
        imObj.setContrast(s_array[sample])
     else:
-        return(sample)
+       return(sample-1) #-1 to return index
 
