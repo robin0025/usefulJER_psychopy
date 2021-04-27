@@ -15,7 +15,7 @@
 # 	- #Images must be in same folder
 #       - #LoadedImg, path = preloader2.preLoadFolder(win, 'png', [stimFolder])
 #
-# 3 - preLoadpwd = just load PWD
+# 3 - preLoadpwd = load all images from PWD
 #
 # 4 - RECOMMENDED: preloadMinImg = Load any image files appearing in excel (with no dupplicates)
 # 	- window = display variable being used, 
@@ -28,9 +28,10 @@
 #	- THVar = Trial Handler Variable 
 #	- imgFile = name of image column in excel
 
-# 6 - imgMatchFolder = match up request image with loaded image and component
+# 6 - RECOMMENDED: imgMatchFolder = match up request image with loaded image and component
 #	- Example image match (replace imgComp.setImage(imgFile))	
-#       - imgMatchFolder(LoadedImg, <imgFile.jpg>, img_0)
+#       - imgMatchFolder(<LoadedImageList>, <imgFile>, <imageComponent>)
+#	imgMatchFolder(ImageList, im_0_file, im_0)
 #
 # 7 - imgMatchPwd = matches images loaded from pwd (this and above can probably be merged)
 #
@@ -40,6 +41,8 @@
 
 import os, sys, glob
 from psychopy import visual
+
+#get path for use in experiment and functions.
 path = os.getcwd()
 
 
@@ -59,10 +62,12 @@ def folderLister(taskStrList): #takes a list object for each of the columns type
 def preLoadFolder(window,fileType,folderList=['NaN'],excludList=['NaN'],subFolder='NaN'):
     imgList = []
     imgObjList = []
+    # Preload images in pwd	
     if 'NaN' in folderList:
         for infile in glob.glob(os.path.join(path,('*.' + fileType))):
 #            imgList.append(infile)
             IdMatch = 0 #reset rejector
+	    # Remove item in exlucsion list
             for excl in excludList:
                 if path+'/'+'/'+excl in infile: #find excluded identities
                     IdMatch = IdMatch+1 #if excluded add to counter
@@ -73,11 +78,13 @@ def preLoadFolder(window,fileType,folderList=['NaN'],excludList=['NaN'],subFolde
             else:
                 continue
     else:
+	# Load from specified folders within a subfolder of the main experiment eg. folderList=['A','B','C']; subFolder='STIMULI' will load from [exp/STIMULI/A/, exp/STIMULI/B/, exp/STIMULI/C/].
         if 'NaN' in subFolder:
             #print('No stim subfolder for readability we recommend the following structure "SCRIPTFOLDER/GENERALSTIM_FOLDER/STIM_FOLDER/STIM.png"')
             for folder in folderList: #look through each subdirectory
                 for infile in glob.glob(os.path.join(path,(folder+'/*.'+fileType))): #for files with filetype ending loop through them
                     IdMatch = 0 #reset rejector
+		    # Remove item in exlucsion list
                     for excl in excludList:
                         if path+'/'+folder+'/'+excl in infile: #find excluded identities
                             IdMatch = IdMatch+1 #if excluded add to counter
@@ -87,10 +94,12 @@ def preLoadFolder(window,fileType,folderList=['NaN'],excludList=['NaN'],subFolde
                        imgList.append(infile) 
                     else:
                         continue
+	# Load images a list of specified folders
         else:
             for folder in folderList: #look through each subdirectory
                 for infile in glob.glob(os.path.join(path,(subFolder+'/'+folder+'/*.'+fileType))): #for files with filetype ending loop through them
                     IdMatch = 0 #reset rejector
+		    # Remove item in exlucsion list
                     for excl in excludList:
                         if path+'/'+subFolder+'/'+folder+'/'+excl in infile: #find excluded identities
                             IdMatch = IdMatch+1 #if excluded add to counter
@@ -100,7 +109,7 @@ def preLoadFolder(window,fileType,folderList=['NaN'],excludList=['NaN'],subFolde
                        imgList.append(infile) 
                     else:
                         continue
-    #print imgList
+    # Create final image object list
     for img in imgList:
         imgObjList.append(visual.ImageStim(window, img, ori=0, pos=[0, 0])) #make base image stim objects
         imgObjList[-1].image = img
@@ -117,9 +126,13 @@ def preLoadpwd(window, fileType): #This function preloads images based on items 
     imgObjList = []
     for infile in glob.glob(os.path.join(path,('*.' + fileType))):
         imgList.append(infile)
+    
+    # Create final image object list
     for img in imgList:
         imgObjList.append(visual.ImageStim(window, img, ori=0, pos=[0, 0]))
         imgObjList[-1].image = img
+    
+
     return (imgObjList,path)
     
 
@@ -132,6 +145,7 @@ def preloadMinImg(window, THVar, imgColList, folder): #This function preloads an
     for ind in THVar.sequenceIndices:
         Trial = THVar.trialList[ind]
 	for imgCol in imgColList:
+	    # don't include items already in list
 	    if Trial.imgCol not in imgMatch:
                 imgMatch.append(Trial.imgCol)
     
@@ -151,29 +165,35 @@ def preloadMinImg(window, THVar, imgColList, folder): #This function preloads an
     return (imgObjList,path)
 
 
-
 ###Below functions are for loading every single image appearing in your excel document.###             
-def preloadXlsx1Col(window, THVar, imgFile): #This function preloads an image to the XLSX file already loaded
-    #(window = display variable being used, THVar = Trial Handler Variable, imgFile = name of image column in excel)
-    #ONLY TO BE USED FOR UNIQUE IMAGE PER TRIAL SITUATION
-    #Can be used with either sequential of randomly handled trials.
+def preloadXlsx1Col(window, THVar, imgFile): # This function preloads an image to the XLSX file already loaded
+    # (window = display variable being used, THVar = Trial Handler Variable, imgFile = name of image column in excel)
+    # ONLY TO BE USED FOR UNIQUE IMAGE PER TRIAL SITUATION
+    
+    # Can be used with either sequential of randomly handled trials.
+    # List of all images including duplicates
     imgMatch = []
     for ind in THVar.sequenceIndices:
         Trial = THVar.trialList[ind]
         imgMatch.append(Trial.imgFile)
-
+    
+    # Make into list
     imgList = []
     imgObjList = []
     for item in imgMatch:
         for infile in glob.glob(os.path.join(path,item)):
             imgList.append(infile)
+
+    # Create final image object list
     for img in imgList:
         imgObjList.append(visual.ImageStim(window, img, ori=0, pos=[0, 0]))
         imgObjList[-1].image = img
+
+
     return (imgObjList,path)
 
-
-def imgMatchFolder(imgObjList, imgFile, imgComp): #This function matches images to the file already loaded
+#This function matches images to the file already loaded
+def imgMatchFolder(imgObjList, imgFile, imgComp): 
     #(loaded = variable of loaded image objects, imgFile = name of image column in excel, imgComp = name of the image component) 
     print('WARNING: recommend images names padded with zeros')
     for img in imgObjList:
@@ -183,7 +203,8 @@ def imgMatchFolder(imgObjList, imgFile, imgComp): #This function matches images 
         imgComp.setImage(imgFile)
         
 
-def imgMatchPwd(imgObjList, imgFile, imgComp): #This function matches images to the file already loaded
+#This function matches images to the file already loaded from PWD
+def imgMatchPwd(imgObjList, imgFile, imgComp): 
     #(loaded = variable of loaded image objects, imgFile = name of image column in excel, imgComp = name of the image component) 
     for img in imgObjList:
         if img.image == (os.path.join(path, str(imgFile))):
@@ -192,7 +213,8 @@ def imgMatchPwd(imgObjList, imgFile, imgComp): #This function matches images to 
         imgComp.setImage(imgFile)
 
 
-def xlsxSingleMatcher(imgObjList, countVar, imgComp): #This function just takes the problem out of the hands of the user, it requires the user to make a count variable to iterate through
+#This function just takes the problem out of the hands of the user, it requires the user to make a count variable to iterate through
+def xlsxSingleMatcher(imgObjList, countVar, imgComp): 
     #(imgObjList = an image object created by another function, countVar = a count variable added to in your paradigm, imgComp = The image component needing to be filled)
     imgComp.setImage(imgObjList[countVar].image)
     
